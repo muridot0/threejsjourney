@@ -2,19 +2,10 @@ import "./style.css";
 import * as THREE from "three";
 import gsap from "gsap";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import GUI from "lil-gui";
 
 //Canvas
 const canvas = document.querySelector(".webgl");
-
-// Cursor
-const cursor = {
-  x: 0,
-  y: 0,
-};
-window.addEventListener("mousemove", (event) => {
-  cursor.x = event.clientX / sizes.width - 0.5;
-  cursor.y = -(event.clientY / sizes.height - 0.5);
-});
 
 const scene = new THREE.Scene();
 
@@ -24,9 +15,16 @@ group.position.set(0, 0, 0);
 group.scale.set(1, 1, 1);
 scene.add(group);
 
+const parameters = {
+  color: 0xff0000,
+  spin: () => {
+    gsap.to(group.rotation, { duration: 1, y: group.rotation.y + 10})
+  }
+}
+
 const cube1 = new THREE.Mesh(
   new THREE.BoxGeometry(1, 1, 1, 5, 5, 5),
-  new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true })
+  new THREE.MeshBasicMaterial({ color: parameters.color })
 );
 
 group.add(cube1);
@@ -101,7 +99,6 @@ const camera = new THREE.PerspectiveCamera(
 );
 scene.add(camera);
 camera.position.set(0, 0, 3);
-camera.lookAt(group.position);
 
 //Controls
 const controls = new OrbitControls(camera, canvas);
@@ -113,6 +110,25 @@ const renderer = new THREE.WebGLRenderer({
 
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+/**
+ * Debug
+ */
+
+const gui = new GUI();
+
+
+
+gui.add(group.position, "y", -3, 3, 0.01).name('elevation')
+gui.add(group, 'visible')
+gui.add(cube1.material, "wireframe").name("middle cube wireframe")
+gui.add(cube2.material, "wireframe").name("left cube wireframe")
+gui.add(cube3.material, "wireframe").name("right cube wireframe")
+gui.addColor(parameters, 'color').onChange(() => {
+  cube1.material.color.set(parameters.color)
+})
+gui.addColor(cube2.material, 'color')
+gui.add(parameters, 'spin')
 
 //Animations
 const tick = () => {
