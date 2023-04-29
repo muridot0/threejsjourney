@@ -4,6 +4,49 @@ import gsap from "gsap";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import GUI from "lil-gui";
 
+/**
+ * Textures
+ */
+const loadingManager = new THREE.LoadingManager();
+
+// loadingManager.onStart = () => {
+//   console.log('started')
+// }
+// loadingManager.onLoad = () => {
+//   console.log('loaded')
+// }
+// loadingManager.onProgress = () => {
+//   console.log('progress')
+// }
+// loadingManager.onError = () => {
+//   console.log('error')
+// }
+
+const textureLoader = new THREE.TextureLoader(loadingManager);
+const colorTexture = textureLoader.load("./textures/minecraft.png");
+const alphaTexture = textureLoader.load('./textures/door/alpha.jpg')
+const heightTexture = textureLoader.load('./textures/door/height.jpg')
+const normalTexture = textureLoader.load('./textures/door/normal.jpg')
+const ambientOcclusionTexture = textureLoader.load('./textures/door/ambientOcclusion.jpg')
+const metalnessTexture = textureLoader.load('./textures/door/metalness.jpg')
+const roughnessTexture = textureLoader.load('./textures/door/roughness.jpg')
+
+// colorTexture.repeat.x = 2
+// colorTexture.repeat.y = 3
+// colorTexture.wrapS = THREE.RepeatWrapping
+// colorTexture.wrapT = THREE.RepeatWrapping
+
+// colorTexture.offset.x = 0.5
+// colorTexture.offset.y = 0.5
+
+// colorTexture.rotation = Math.PI * 0.25
+// colorTexture.center.x = 0.5
+// colorTexture.center.y = 0.5
+
+colorTexture.generateMipmaps = false
+colorTexture.minFilter = THREE.NearestFilter
+colorTexture.magFilter = THREE.NearestFilter
+
 //Canvas
 const canvas = document.querySelector(".webgl");
 
@@ -18,13 +61,13 @@ scene.add(group);
 const parameters = {
   color: 0xff0000,
   spin: () => {
-    gsap.to(group.rotation, { duration: 1, y: group.rotation.y + 10})
-  }
-}
+    gsap.to(group.rotation, { duration: 1, y: group.rotation.y + 10 });
+  },
+};
 
 const cube1 = new THREE.Mesh(
   new THREE.BoxGeometry(1, 1, 1, 5, 5, 5),
-  new THREE.MeshBasicMaterial({ color: parameters.color })
+  new THREE.MeshBasicMaterial({ map: colorTexture })
 );
 
 group.add(cube1);
@@ -117,18 +160,16 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 const gui = new GUI();
 
-
-
-gui.add(group.position, "y", -3, 3, 0.01).name('elevation')
-gui.add(group, 'visible')
-gui.add(cube1.material, "wireframe").name("middle cube wireframe")
-gui.add(cube2.material, "wireframe").name("left cube wireframe")
-gui.add(cube3.material, "wireframe").name("right cube wireframe")
-gui.addColor(parameters, 'color').onChange(() => {
-  cube1.material.color.set(parameters.color)
-})
-gui.addColor(cube2.material, 'color')
-gui.add(parameters, 'spin')
+gui.add(group.position, "y", -3, 3, 0.01).name("elevation");
+gui.add(group, "visible");
+gui.add(cube1.material, "wireframe").name("middle cube wireframe");
+gui.add(cube2.material, "wireframe").name("left cube wireframe");
+gui.add(cube3.material, "wireframe").name("right cube wireframe");
+gui.addColor(parameters, "color").onChange(() => {
+  cube1.material.color.set(parameters.color);
+});
+gui.addColor(cube2.material, "color");
+gui.add(parameters, "spin");
 
 //Animations
 const tick = () => {
